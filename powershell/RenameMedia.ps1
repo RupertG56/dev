@@ -27,7 +27,7 @@ param(
     [switch]$DryRun = $false
 )
 
-
+Write-Output "Renaming files in path: $Path"
 Get-ChildItem -Path $Path -Recurse -File | ForEach-Object {
     if ($Complex) {
         $seasonMatch = [regex]::Match($_.Name, 'Season\s(\d+)', 'IgnoreCase')
