@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "Debug RenameMedia.ps1",
+            "script": "${workspaceFolder}/powershell/RenameMedia.ps1",
+            "args": [
+                "-Path",
+                "C:/Users/rjone/DRmare/Friends",
+                "-complexRename",
+                "$true",
+                "-BeginWithTemplate",
+                "'Friends'",
+                "-dryRun",
+                "$false"
+            ]
+        }
+    ]
+}
