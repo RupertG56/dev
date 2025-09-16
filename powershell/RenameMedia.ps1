@@ -24,11 +24,12 @@ param(
     [string]$Path = ".",
     [string]$BeginWithTemplate = "",
     [switch]$Complex = $false,
-    [switch]$DryRun = $false
+    [switch]$WhatIf = $false
 )
 
 Write-Output "Renaming files in path: $Path"
-Get-ChildItem -Path $Path -Recurse -File | ForEach-Object {
+$files = Get-ChildItem -Path $Path -Recurse -File
+$files | ForEach-Object {
     if ($Complex) {
         $seasonMatch = [regex]::Match($_.Name, 'Season\s(\d+)', 'IgnoreCase')
         $episodeMatch = [regex]::Match($_.Name, 'Episode\s(\d+)', 'IgnoreCase')
@@ -39,13 +40,9 @@ Get-ChildItem -Path $Path -Recurse -File | ForEach-Object {
             $seasonNumber = $seasonNumber.PadLeft(2, '0')
             $episodeNumber = $episodeNumber.PadLeft(2, '0')
             $newName = "$BeginWithTemplate.s$seasonNumber" + "e$episodeNumber" + [System.IO.Path]::GetExtension($_.Name)
-            if ($DryRun) {
-                Rename-Item -Path $_.FullName -NewName $newName -WhatIf
-            }
-            else {
-                Write-Host "Renaming '$($_.Name)' to '$newName'"
-                Rename-Item -Path $_.FullName -NewName $newName
-            }
+            
+            Write-Host "Renaming '$($_.Name)' to '$newName'"
+            Rename-Item -Path $_.FullName -NewName $newName -WhatIf:$WhatIf
         }
         return
     } else {
@@ -59,12 +56,7 @@ Get-ChildItem -Path $Path -Recurse -File | ForEach-Object {
         $newName = $_.Name -replace '^\d+\s', ''
         $newName = Join-Path -Path $_.Directory.FullName -ChildPath ("$parentDir.s$seasonNumber" + "e$episodeNumber.$($newName)")
 
-        if ($DryRun) {
-            Rename-Item -Path $_.FullName -NewName $newName -WhatIf
-        }
-        else {
-            Write-Host "Renaming '$($_.Name)' to '$newName'"
-            Rename-Item -Path $_.FullName -NewName $newName
-        }
+        Write-Host "Renaming '$($_.Name)' to '$newName'"
+        Rename-Item -Path $_.FullName -NewName $newName -WhatIf:$WhatIf
     }
 }
