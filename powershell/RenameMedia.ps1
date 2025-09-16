@@ -13,23 +13,23 @@
 #             "script": "${workspaceFolder}/RenameMedia.ps1",
 #             "args": [
 #                 "-Path", ".",
-#                 "-complexRename", "false",
+#                 "-Complex", "false",
 #                 "-BeginWithTemplate", "",
-#                 "-dryRun", "true"
+#                 "-DryRun", "true"
 #             ]
 #         }
 #     ]
 # }
 param(
     [string]$Path = ".",
-    [bool]$complexRename = $false,
     [string]$BeginWithTemplate = "",
-    [bool]$dryRun = $false
+    [switch]$Complex = $false,
+    [switch]$DryRun = $false
 )
 
-Set-Location -Path $Path
-Get-ChildItem -Recurse -File | ForEach-Object {
-    if ($complexRename) {
+
+Get-ChildItem -Path $Path -Recurse -File | ForEach-Object {
+    if ($Complex) {
         $seasonMatch = [regex]::Match($_.Name, 'Season\s(\d+)', 'IgnoreCase')
         $episodeMatch = [regex]::Match($_.Name, 'Episode\s(\d+)', 'IgnoreCase')
         $seasonNumber = if ($seasonMatch.Success) { $seasonMatch.Groups[1].Value } else { $null }
@@ -39,9 +39,11 @@ Get-ChildItem -Recurse -File | ForEach-Object {
             $seasonNumber = $seasonNumber.PadLeft(2, '0')
             $episodeNumber = $episodeNumber.PadLeft(2, '0')
             $newName = "$BeginWithTemplate.s$seasonNumber" + "e$episodeNumber" + [System.IO.Path]::GetExtension($_.Name)
-            if ($dryRun) {
-                Write-Host "Dry Run: Renaming '$($_.Name)' to '$newName'"
-            } else {
+            if ($DryRun) {
+                Rename-Item -Path $_.FullName -NewName $newName -WhatIf
+            }
+            else {
+                Write-Host "Renaming '$($_.Name)' to '$newName'"
                 Rename-Item -Path $_.FullName -NewName $newName
             }
         }
@@ -53,13 +55,15 @@ Get-ChildItem -Recurse -File | ForEach-Object {
         $seasonMatch = [regex]::Match($_.Directory.Name, '(\d+)', 'IgnoreCase')
         $seasonNumber = if ($seasonMatch.Success) { $seasonMatch.Groups[1].Value } else { $null }
         $seasonNumber = $seasonNumber.PadLeft(2, '0')
-        $parentDir = Split-Path $_.Directory.FullName -Leaf
+        $parentDir = Split-Path $_.Directory.Parent.FullName -Leaf
         $newName = $_.Name -replace '^\d+\s', ''
-        $newName = "$parentDir.s$seasonNumber" + "e$episdoeNumber.$($newName)"
+        $newName = Join-Path -Path $_.Directory.FullName -ChildPath ("$parentDir.s$seasonNumber" + "e$episodeNumber.$($newName)")
 
-        if ($dryRun) {
-            Write-Host "Dry Run: Renaming '$($_.Name)' to '$newName'"
-        } else {
+        if ($DryRun) {
+            Rename-Item -Path $_.FullName -NewName $newName -WhatIf
+        }
+        else {
+            Write-Host "Renaming '$($_.Name)' to '$newName'"
             Rename-Item -Path $_.FullName -NewName $newName
         }
     }
