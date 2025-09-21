@@ -1,7 +1,7 @@
 param(
     [Parameter(Mandatory=$true)]
     [string]$Path,
-    [switch]$dryRun = $false
+    [switch]$WhatIf = $false
 )
 
 # Get all files in the specified path
@@ -19,7 +19,7 @@ foreach ($file in $files) {
 
         # Create the season folder if it doesn't exist
         if (-not (Test-Path $seasonFolderPath)) {
-            if ($dryRun) {
+            if ($WhatIf) {
                 New-Item -Path $seasonFolderPath -ItemType Directory -WhatIf | Out-Null
             } else {
                 Write-Output "Creating folder: $seasonFolderPath"
@@ -28,7 +28,7 @@ foreach ($file in $files) {
         }
 
         # Move the file into the season folder
-        if ($dryRun) {
+        if ($WhatIf) {
             Move-Item -Path $file.FullName -Destination $seasonFolderPath -WhatIf
         } else {
             Write-Output "Moving file '$($file.Name)' to '$seasonFolder'"

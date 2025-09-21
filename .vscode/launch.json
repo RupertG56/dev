@@ -2,6 +2,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "debugpy",
+            "request": "launch",
+            "name": "Python Debugger: Current File with Arguments",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": "'C:/Users/rjone/DRmare/Doc McStuffins/Season 01'"
+        },
+        {
             "type": "PowerShell",
             "request": "launch",
             "name": "Debug -DryRun RenameMedia.ps1",
@@ -9,7 +17,7 @@
             "args": [
                 "-Path",
                 "'C:/Users/rjone/DRmare/Blues Clues'",
-                "-DryRun"
+                "-WhatIf"
             ]
         },
         {
@@ -23,7 +31,7 @@
                 "-BeginWithTemplate",
                 "'Friends'",
                 "-Complex",
-                "-DryRun"
+                "-WhatIf"
             ]
         },
         {
@@ -35,6 +43,19 @@
                 "-Path",
                 "C:/Users/rjone/DRmare/Friends",
                 "-dryRun"
+            ]
+        },
+        {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "Debug iTunesMediaRename.ps1",
+            "script": "${workspaceFolder}/powershell/iTunesMediaRename.ps1",
+            "args": [
+                "-Path",
+                "'C:/Users/rjone/DRmare/Doc McStuffins/Season 01'",
+                "-TwoPerFile",
+                "$true",
+                "-WhatIf"
             ]
         }
     ]
