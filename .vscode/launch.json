@@ -23,6 +23,13 @@
         {
             "type": "PowerShell",
             "request": "launch",
+            "name": "Current File",
+            "script": "${file}",
+            "args": []
+        },
+        {
+            "type": "PowerShell",
+            "request": "launch",
             "name": "Debug -DryRun -Complex RenameMedia.ps1",
             "script": "${workspaceFolder}/powershell/RenameMedia.ps1",
             "args": [
