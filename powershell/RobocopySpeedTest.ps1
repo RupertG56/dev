@@ -1,5 +1,5 @@
 # Define source and destination
-$Source = "C:\Users\rjone\DRmare\Burn Notice The Fall of Sam Axe"
+$Source = "C:\Users\rjone\DRmare\movies"
 $Destination = "Z:\plexmedia\movies\"
 $LogFile = "Z:\dump\robocopy.log"
 
