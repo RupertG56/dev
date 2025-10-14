@@ -62,12 +62,7 @@ function Convert-VideoFile {
     $STEREO_CHANNEL_COUNT = 2
     try {
         # Detect current video codec
-        $VideoCodec = & ffprobe -v error -select_streams v:0 `
-            -show_entries stream=codec_name `
-            -of default=noprint_wrappers=1:nokey=1 "$File" 2>$null
-        $VideoCodec = & ffprobe -v error -select_streams v:0 `
-            -show_entries stream=codec_name `
-            -of default=noprint_wrappers=1:nokey=1 "$File" 2>$null
+        $VideoCodec = & ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 "$File" 2>$null
 
         if ($VideoCodec -eq 'hevc') {
             Write-Verbose "Skipping (already H.265): $File"
@@ -75,7 +70,7 @@ function Convert-VideoFile {
         }
 
         # Detect number of audio channels
-        $Channels = & ffprobe -v error -select_streams a:0 `
+        $Channels = & ffprobe -v error -select_streams a:0 -show_entries stream=channels -of default=noprint_wrappers=1:nokey=1 "$File" 2>$null
         if (-not $Channels) { $Channels = $STEREO_CHANNEL_COUNT } # default safety
 
         # Choose audio encoding parameters
@@ -104,6 +99,7 @@ function Convert-VideoFile {
             Write-Host "Encoding: $File"
             $process = Start-Process -FilePath "cmd.exe" -ArgumentList "/c $Cmd" -Wait -NoNewWindow -PassThru
             if ($process.ExitCode -eq 0) {
+                Move-Item -Force $TmpFile $OutFile
                 Write-Host "✔ Completed: $OutFile" -ForegroundColor Green
             }
             else {

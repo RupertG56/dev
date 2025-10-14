@@ -1,4 +1,43 @@
 # File: EncodeTools.psm1
+function Export-Mp4ToMkv {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param (
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [string]$File
+    )
+
+    process {
+        try {
+            $OutFile = [System.IO.Path]::ChangeExtension($File.FullName, '.mkv')
+            $LogFile = "$($OutFile).log"
+
+            Write-Host "CONVERTING: $File to $OutFile"
+            $process = Start-Process -Wait -NoNewWindow -FilePath "HandBrakeCLI" -ArgumentList @(
+                '--encoder', 'x265',
+                '--quality', '24',
+                '--aencoder', 'eac3',
+                '--ab', '384',
+                '--all-audio',
+                '--all-subtitles',
+                '--subtitle-burned=none',
+                '--format', 'mkv',
+                '-i', $File.FullName,
+                '-o', $OutFile
+            ) -RedirectStandardOutput $LogFile -RedirectStandardError "$LogFile.err"
+
+            if ($process.ExitCode -eq 0) {
+                Write-Host "OK: $OutFile"
+            }
+            else {
+                Write-Warning "FAIL: $File (exit $($process.ExitCode))"
+            }
+        }
+        catch {
+            Write-Warning "FAIL: $File ($($_.Exception.Message))"
+        }
+    }
+}
+
 function Convert-VideoFile {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param (
@@ -17,12 +56,7 @@ function Convert-VideoFile {
     $STEREO_CHANNEL_COUNT = 2
     try {
         # Detect current video codec
-        $VideoCodec = & ffprobe -v error -select_streams v:0 `
-            -show_entries stream=codec_name `
-            -of default=noprint_wrappers=1:nokey=1 "$File" 2>$null
-        $VideoCodec = & ffprobe -v error -select_streams v:0 `
-            -show_entries stream=codec_name `
-            -of default=noprint_wrappers=1:nokey=1 "$File" 2>$null
+        $VideoCodec = & ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 "$File" 2>$null
 
         if ($VideoCodec -eq 'hevc') {
             Write-Verbose "Skipping (already H.265): $File"
@@ -30,7 +64,7 @@ function Convert-VideoFile {
         }
 
         # Detect number of audio channels
-        $Channels = & ffprobe -v error -select_streams a:0 `
+        $Channels = & ffprobe -v error -select_streams a:0 -show_entries stream=channels -of default=noprint_wrappers=1:nokey=1 "$File" 2>$null
         if (-not $Channels) { $Channels = $STEREO_CHANNEL_COUNT } # default safety
 
         # Choose audio encoding parameters
@@ -56,9 +90,10 @@ function Convert-VideoFile {
         $Cmd = "ffmpeg -hide_banner -nostdin -y -i `"$File`" -map 0 -c:v libx265 -preset medium -crf 28 $AudioArgs -c:s srt -metadata:s:s:0 language=eng `"$TmpFile`""
 
         if ($PSCmdlet.ShouldProcess($File, "Encode to $OutFile")) {
-            Write-Host "Encoding: $File"
-            $process = Start-Process -FilePath "cmd.exe" -ArgumentList "/c $Cmd" -Wait -NoNewWindow -PassThru
+            Write-Host "Encoding: $File using command [$Cmd]"
+            $process = Start-Process -FilePath "cmd.exe" -ArgumentList "/c $Cmd" -Wait -PassThru
             if ($process.ExitCode -eq 0) {
+                Move-Item -Force $TmpFile $OutFile
                 Write-Host "✔ Completed: $OutFile" -ForegroundColor Green
             }
             else {
@@ -73,3 +108,4 @@ function Convert-VideoFile {
 }
 
 Export-ModuleMember -Function Convert-VideoFile
+Export-ModuleMember -Function Export-Mp4ToMkv
