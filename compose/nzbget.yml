@@ -1,0 +1,46 @@
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-5.4.0
+
+# NOTE: If you generated this yaml from an unprivileged and rootless podman container on an SELinux
+# enabled system, check the podman generate kube man page for steps to follow to ensure that your pod/container
+# has the right permissions to access the volumes added.
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    bind-mount-options: /nas/nzb/config:Z
+  creationTimestamp: "2025-10-12T02:29:10Z"
+  labels:
+    app: nzbget-pod
+  name: nzbget-pod
+spec:
+  containers:
+  - env:
+    - name: PGID
+      value: "1000"
+    - name: PUID
+      value: "1000"
+    - name: TZ
+      value: America/Denver
+    image: lscr.io/linuxserver/nzbget:latest
+    name: nzbget
+    ports:
+    - containerPort: 6789
+      hostPort: 6789
+    volumeMounts:
+    - mountPath: /config
+      name: nas-nzb-config-host-0
+    - mountPath: /downloads
+      name: nas-nzb-downloads-host-1
+  volumes:
+  - hostPath:
+      path: /nas/nzb/config
+      type: Directory
+    name: nas-nzb-config-host-0
+  - hostPath:
+      path: /nas/nzb/downloads
+      type: Directory
+    name: nas-nzb-downloads-host-1

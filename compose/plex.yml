@@ -1,0 +1,49 @@
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-5.4.0
+
+# NOTE: If you generated this yaml from an unprivileged and rootless podman container on an SELinux
+# enabled system, check the podman generate kube man page for steps to follow to ensure that your pod/container
+# has the right permissions to access the volumes added.
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    bind-mount-options: /nas/plexmedia:Z
+  creationTimestamp: "2025-10-12T02:28:44Z"
+  labels:
+    app: plex-pod
+  name: plex-pod
+spec:
+  containers:
+  - env:
+    - name: PGID
+      value: "1000"
+    - name: VERSION
+      value: docker
+    - name: PUID
+      value: "1000"
+    - name: PLEX_CLAIM
+      value: “claim-QAZGGxQfMBaczVWMLA3s”
+    - name: TZ
+      value: America/Denver
+    image: lscr.io/linuxserver/plex:latest
+    name: plex
+    volumeMounts:
+    - mountPath: /config
+      name: nas-plex-config-host-0
+    - mountPath: /data
+      name: nas-plexmedia-host-1
+  hostNetwork: true
+  hostname: localhost.localdomain
+  volumes:
+  - hostPath:
+      path: /nas/plex/config
+      type: Directory
+    name: nas-plex-config-host-0
+  - hostPath:
+      path: /nas/plexmedia
+      type: Directory
+    name: nas-plexmedia-host-1

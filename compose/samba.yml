@@ -1,0 +1,41 @@
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-5.4.0
+
+# NOTE: If you generated this yaml from an unprivileged and rootless podman container on an SELinux
+# enabled system, check the podman generate kube man page for steps to follow to ensure that your pod/container
+# has the right permissions to access the volumes added.
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    bind-mount-options: /nas:Z
+  creationTimestamp: "2025-10-12T02:28:22Z"
+  labels:
+    app: samba-pod
+  name: samba-pod
+spec:
+  containers:
+  - env:
+    - name: NAME
+      value: nas
+    - name: PASS
+      value: WfPo4*5b
+    - name: “PUID
+      value: 1000”
+    - name: “PGID
+      value: 1000”
+    image: docker.io/dockurr/samba:latest
+    name: samba
+    volumeMounts:
+    - mountPath: /storage
+      name: nas-host-0
+  hostNetwork: true
+  hostname: localhost.localdomain
+  volumes:
+  - hostPath:
+      path: /nas
+      type: Directory
+    name: nas-host-0
