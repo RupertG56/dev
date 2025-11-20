@@ -1,0 +1,13 @@
+## /etc/systemd/system/podman_init@.service
+[Unit]
+Description=Start Podman Container %i
+After=network.target
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/podman start -a %i
+ExecStop=/usr/bin/podman stop -t 10 %i
+
+[Install]
+WantedBy=multi-user.target
+
