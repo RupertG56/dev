@@ -6,7 +6,7 @@ sudo podman run --replace -d \
     -e MYSQL_ROOT_PASSWORD="7dVdjKmkFv7r9D" \
     -e MARIADB_USER="ryan" \
     -e MARIADB_PASSWORD="q27g5IrAbljHW3" \
-    -e MARIADB_DATABASE="ryan_db"
+    -e MARIADB_DATABASE="ryan_db" \
     --restart=always \
     "docker.io/library/mariadb:latest"
 
