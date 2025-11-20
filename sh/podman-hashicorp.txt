@@ -1,0 +1,3 @@
+podman run -d --name vault -p 8200:8200 --cap-add IPC_LOCK -v /nas/vault-server/config:/vault/config:Z -v /nas/vault-server/data:/vault/data:Z hashicorp/vault:latest server -config=/vault/config/vault.hcl
+
+podman run -d  --name vault --userns=keep-id -v /nas/vault-server/data:/vault/data:Z  -v /nas/vault-server/config:/vault/config:Z  -v /nas/vault-server/logs:/vault/logs:Z  --cap-add IPC_LOCK --network=host docker.io/hashicorp/vault vault server -config=/vault/config/vault.hcl

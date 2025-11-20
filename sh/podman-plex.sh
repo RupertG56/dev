@@ -1,0 +1,1 @@
+sudo podman run --replace -d --name=plex --net=host -e PUID=1000 -e PGID=1000 -e TZ=America/Denver -e VERSION=docker -v /nas/plex/config:/config:Z -v /nas/plexmedia:/data:Z --restart=unless-stopped lscr.io/linuxserver/plex:latest
