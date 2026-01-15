@@ -9,7 +9,7 @@ param(
 # $SourceDir = $RootDir
 Get-ChildItem -Path $RootDir -Recurse -File | ForEach-Object {
     $file = $_
-    $destFile = [System.IO.Path]::ChangeExtension($file.FullName, ".mb4")
+    $destFile = [System.IO.Path]::ChangeExtension($file.FullName, ".m4b")
     Write-Output $file.FullName
     Write-Output $destFile
     if (-Not (Test-Path $destFile)) {
