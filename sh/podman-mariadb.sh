@@ -7,7 +7,7 @@ sudo podman run --replace -d \
     -e MARIADB_USER="ryan" \
     -e MARIADB_PASSWORD="q27g5IrAbljHW3" \
     -e MARIADB_DATABASE="ryan_db" \
-    --restart=always \
+    --restart=always \q
     "docker.io/library/mariadb:latest"
 
 echo "MariaDB container 'mariadb' started using host network. Data stored in volume '/nas/mariadb/data'."
