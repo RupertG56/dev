@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# zfs_samba_check.sh - verify recommended ZFS properties for Samba datasets
+# zfs_samba_check.sh - verify recommended ZFS properties for Samba datasets test
 
 POOL="nas"   # change to your pool name
 
